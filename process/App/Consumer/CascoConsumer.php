@@ -36,7 +36,6 @@ class CascoConsumer implements ConsumerInterface {
 
         while ($this->consumer->channel->is_consuming()) {
             $this->consumer->channel->wait();
-
         }
         $this->consumer->connectionClose();
     }
