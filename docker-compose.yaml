@@ -23,25 +23,6 @@ services:
     working_dir: /var/www/process
     tty: true
 
-  db:
-    image: mysql
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: example
-    volumes:
-      - ./db/:/var/lib/mysql
-    ports:
-      - "3307:3306"
-  php-my-admin:
-    image: phpmyadmin/phpmyadmin
-    restart: always
-    ports:
-      - "8070:80"
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - "8071:8080"
   rabbitmq:
     image: rabbitmq:3-management
     restart: always

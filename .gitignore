@@ -1,2 +1,6 @@
-process/vendor/*
-db/*
+process/vendor
+db
+process/composer.lock
+.idea
+process/logs.txt
+process/logs2.txt
