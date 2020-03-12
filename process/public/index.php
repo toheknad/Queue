@@ -10,7 +10,6 @@ use App\Consumer\ConsumerFactory;
 chdir(dirname(__DIR__));
 require 'vendor/autoload.php';
 
-
 switch ($_SERVER['argv'][1]){
     case 'producer':
         $producer = new Producer($_SERVER['argv'][2]);
@@ -21,8 +20,9 @@ switch ($_SERVER['argv'][1]){
         $producer->addMessageToQueue('test', ['name' => '3123']);
         break;
     case 'consumer':
-            $consumer = (new ConsumerFactory())->createConsumer($_SERVER['argv'][2]);
+            $consumer = (new ConsumerFactory())->createConsumer($_SERVER['argv'][2], $_SERVER['argv'][3]);
             $consumer->connectToQueue();
+
         break;
     default:
         echo 'Something gone wrong!';

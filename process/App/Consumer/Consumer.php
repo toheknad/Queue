@@ -4,6 +4,7 @@
 namespace App\Consumer;
 
 
+use GuzzleHttp\Psr7\Request;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
@@ -45,6 +46,15 @@ class Consumer
         if ($this->channel->queue_declare($name, false, false, false, false)) {
             return true;
         };
+        return false;
+    }
+
+    public function log($data): bool
+    {
+        $response = '--- Name: '.$data->name." | ".'LastName: '.$data->lastName." | ".'Phone: '.$data->phone . "\n";
+        if (file_put_contents('logs.txt', $response, FILE_APPEND)) {
+            return true;
+        }
         return false;
     }
 

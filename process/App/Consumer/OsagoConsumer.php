@@ -1,40 +1,41 @@
 <?php
 
-namespace Consumer;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
+namespace App\Consumer;
 
-chdir(dirname(__DIR__));
-require 'vendor/autoload.php';
-$connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
-$channel = $connection->channel();
+use App\Consumer\Consumer;
+use App\Consumer\ConsumerInterface;
 
-$channel->exchange_declare('ex_lead', 'direct', false, false, false);
+class OsagoConsumer extends Consumer implements ConsumerInterface {
 
-$channel->queue_declare("lead_casco", false, false, false, false);
+    protected $consumer = null;
 
-$type = ['osago','credit'];
-$severities = ['osago'];
-if (empty($severities)) {
-    file_put_contents('php://stderr', "Usage: $argv[0] [info] [warning] [error]\n");
-    exit(1);
+    /**
+     * CascoConsumer constructor.
+     * @param string $queueName
+     */
+    public function __construct(string $queueName = '')
+    {
+        parent::__construct($queueName);
+    }
+
+    /**
+     * @return bool
+     */
+    public function connectToQueue(): bool
+    {
+        echo "\n--- Channel connected ---\n";
+        $callback = function ($msg) {
+            $this->log(json_decode($msg->get('content_type')));
+            sleep(2);
+            $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
+        };
+
+        $this->channel->basic_qos(null, 1, null);
+        $this->channel->basic_consume($this->queue, '', false, false, false, false, $callback);
+
+        while ($this->channel->is_consuming()) {
+            $this->channel->wait();
+        }
+        $this->connectionClose();
+    }
 }
-
-foreach ($severities as $severity) {
-    $channel->queue_bind('lead', 'ex_lead', $severity);
-}
-
-echo " [*] Waiting for logs. To exit press CTRL+C\n";
-
-$callback = function ($msg) {
-    echo ' [x] ', $msg->delivery_info['routing_key'], ':', $msg->body, "\n";
-    sleep(3);
-};
-
-$channel->basic_consume('lead', '', false, true, false, false, $callback);
-
-while ($channel->is_consuming()) {
-    $channel->wait();
-}
-
-$channel->close();
-$connection->close();

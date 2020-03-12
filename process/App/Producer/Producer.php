@@ -82,14 +82,14 @@ class Producer
                 'content_type' => json_encode(
                 [
                     'name' => $names[rand(0,count($names)-1)],
-                    'lastName' => $names[rand(0,count($lastNames)-1)],
-                    'phone' => $names[rand(0,count($phones)-1)],
+                    'lastName' => $lastNames[rand(0,count($lastNames)-1)],
+                    'phone' => $phones[rand(0,count($phones)-1)],
                 ]
             )]);
             $this->channel->basic_publish($msg, '', $this->queue);
         }
         $this->connectionClose();
-        echo 'Lead generated succesufully!';
+        echo "Lead generated succesufully! \n";
         return true;
     }
 
